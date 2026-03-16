@@ -1,0 +1,31 @@
+{
+  "name": "codepreneur/halkpay-gateway",
+  "description": "Laravel package for HalkPay 3D Hosted gateway integration",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Codepreneur"
+    }
+  ],
+  "require": {
+    "php": "^8.2",
+    "illuminate/support": "^11.0|^12.0",
+    "illuminate/http": "^11.0|^12.0",
+    "illuminate/routing": "^11.0|^12.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Codepreneur\\HalkPayGateway\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Codepreneur\\HalkPayGateway\\HalkPayGatewayServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
