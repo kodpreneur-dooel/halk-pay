@@ -1,5 +1,5 @@
 {
-  "name": "codepreneur/halkpay-gateway",
+  "name": "codepreneur/halk-pay",
   "description": "Laravel package for HalkPay 3D Hosted gateway integration",
   "type": "library",
   "license": "MIT",

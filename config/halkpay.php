@@ -19,8 +19,10 @@ return [
     ],
 
     'callback' => [
-        'response_mode' => env('HALKPAY_CALLBACK_RESPONSE_MODE', 'json'), // json|redirect
+        'response_mode' => env('HALKPAY_CALLBACK_RESPONSE_MODE', 'json'), // json|redirect|view
         'success_redirect_to' => env('HALKPAY_CALLBACK_SUCCESS_REDIRECT_TO', '/'),
         'fail_redirect_to' => env('HALKPAY_CALLBACK_FAIL_REDIRECT_TO', '/'),
+        'success_view' => env('HALKPAY_CALLBACK_SUCCESS_VIEW', 'halkpay::payments.success'),
+        'fail_view' => env('HALKPAY_CALLBACK_FAIL_VIEW', 'halkpay::payments.fail'),
     ],
 ];
