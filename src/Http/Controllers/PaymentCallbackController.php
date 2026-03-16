@@ -7,19 +7,32 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\View\View;
 
 class PaymentCallbackController extends Controller
 {
-    public function __invoke(Request $request, PaymentCallbackService $service): JsonResponse|RedirectResponse
+    public function __invoke(Request $request, PaymentCallbackService $service): JsonResponse|RedirectResponse|View
     {
         $result = $service->handle($request);
 
-        if (config('halkpay.callback.response_mode') === 'redirect') {
+        $responseMode = (string)config('halkpay.callback.response_mode', 'json');
+
+        if ($responseMode === 'redirect') {
             return redirect()->to(
                 $result->successful
                     ? (string)config('halkpay.callback.success_redirect_to', '/')
                     : (string)config('halkpay.callback.fail_redirect_to', '/'),
             );
+        }
+
+        if ($responseMode === 'view') {
+            $view = $result->successful
+                ? (string)config('halkpay.callback.success_view', 'halkpay::payments.success')
+                : (string)config('halkpay.callback.fail_view', 'halkpay::payments.fail');
+
+            return view($view, [
+                'result' => $result,
+            ]);
         }
 
         return response()->json([

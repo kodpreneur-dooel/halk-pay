@@ -28,6 +28,10 @@ class HalkPayGatewayServiceProvider extends ServiceProvider
             __DIR__ . '/../config/halkpay.php' => config_path('halkpay.php'),
         ], 'halkpay-config');
 
+        $this->publishes([
+            __DIR__ . '/../resources/views' => resource_path('views/vendor/halkpay'),
+        ], 'halkpay-views');
+
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'halkpay');
 
         Route::aliasMiddleware('halkpay.hash', ValidateHalkPayCallbackHash::class);
