@@ -1,36 +1,77 @@
-# Codepreneur HalkPay Gateway
+# Codepreneur HalkPay Package
 
 Reusable Laravel package for HalkPay 3D Hosted gateway integrations.
 
-## Why this package is universal
-
-- No hard-coded app domain assumptions (no `order/installment/user` OID format requirement).
-- Host applications can provide their own OID resolver through a contract.
-- Host applications can provide their own callback processor for domain persistence.
-- Callback handling can return JSON or redirect, configurable per project.
-- Package routes are configurable (prefix, middleware, route names) and can be disabled.
-
-## Install
+## Installation
 
 ```bash
-composer require codepreneur/halkpay-gateway
+composer require codepreneur/halk-pay
 ```
 
-## Publish config
+> The package supports Laravel 11/12 and PHP 8.2+.
+
+## Setup (works in any Laravel project)
+
+### 1) Publish package config
 
 ```bash
 php artisan vendor:publish --tag=halkpay-config
 ```
 
-## Config (`config/halkpay.php`)
+This creates `config/halkpay.php` in your app.
 
-- Gateway credentials / URLs (`client_id`, `store_key`, `gateway_url`, etc.)
-- Route behavior (`routes.enabled`, `routes.prefix`, `routes.middleware`, `routes.name_prefix`)
-- Callback response mode (`callback.response_mode = json|redirect`)
+### 2) Configure environment variables
 
-## Host extension points
+Add these to your `.env` file (values provided by HalkPay/bank):
 
-### 1) Resolve domain reference from OID (optional)
+```dotenv
+HALKPAY_CLIENT_ID=
+HALKPAY_STORE_KEY=
+HALKPAY_OK_URL=
+HALKPAY_FAIL_URL=
+HALKPAY_CALLBACK_URL=
+HALKPAY_GATEWAY_URL=https://entegrasyon.asseco-see.com.tr/fim/est3Dgate
+HALKPAY_GATEWAY_METHOD=POST
+HALKPAY_CURRENCY=934
+HALKPAY_LANG=tk
+HALKPAY_TRANSACTION_TYPE=Auth
+```
+
+### 3) Adjust project route behavior (optional)
+
+In `config/halkpay.php`:
+
+- Toggle package routes with `routes.enabled`
+- Change route prefix via `routes.prefix`
+- Add your middleware in `routes.middleware`
+- Rename route names via `routes.name_prefix`
+
+Default routes:
+
+- `POST /halkpay/redirect` (`halkpay.redirect`)
+- `POST /halkpay/callback` (`halkpay.callback`)
+
+### 4) Trigger payment redirect from your app
+
+Post to the redirect route from any controller/form:
+
+```php
+return redirect()->route('halkpay.redirect');
+```
+
+Typical payload:
+
+- `amount` (required)
+- `oid` (optional, generated if omitted)
+- `customer_name` / `bill_to_name` (optional)
+- `success_url` / `fail_url` / `callback_url` (optional overrides)
+- `installment` (optional)
+
+## Universal integration points
+
+This package is designed to run in any project because domain-specific logic is optional and pluggable.
+
+### Resolve your own OID format/reference (optional)
 
 ```php
 use Codepreneur\HalkPayGateway\Contracts\TransactionReferenceResolver;
@@ -38,7 +79,7 @@ use Codepreneur\HalkPayGateway\Contracts\TransactionReferenceResolver;
 $this->app->bind(TransactionReferenceResolver::class, YourOidResolver::class);
 ```
 
-### 2) Process callback result in your domain (optional)
+### Process callback inside your own domain (optional)
 
 ```php
 use Codepreneur\HalkPayGateway\Contracts\CallbackProcessor;
@@ -46,40 +87,16 @@ use Codepreneur\HalkPayGateway\Contracts\CallbackProcessor;
 $this->app->bind(CallbackProcessor::class, YourCallbackProcessor::class);
 ```
 
-If you do not bind these contracts, the package uses safe no-op defaults.
+If these contracts are not bound, the package safely falls back to no-op defaults.
 
-## Routes
+## Callback handling and security
 
-Default:
-
-- `POST /halkpay/redirect` (`halkpay.redirect`)
-- `POST /halkpay/callback` (`halkpay.callback`)
-
-## Redirect endpoint request payload
-
-Required:
-
-- `amount`
-
-Optional:
-
-- `oid` (if omitted, ULID is generated)
-- `customer_name` / `bill_to_name`
-- `callback_url`
-- `success_url`
-- `fail_url`
-- `lang`
-- `currency`
-- `transaction_type`
-- `installment`
-
-## Security
-
-- Callback hash is validated using `HASHPARAMS`, `HASHPARAMSVAL`, and `HASH` + `store_key`.
+- Callback hash validation is built in (`HASHPARAMS`, `HASHPARAMSVAL`, `HASH` + `store_key`)
 - Middleware alias: `halkpay.hash`
+- Callback response mode is configurable: `callback.response_mode = json|redirect`
 
 ## Events
 
 - `Codepreneur\HalkPayGateway\Events\HalkPayCallbackReceived`
 
-Listen to this event if you prefer event-driven processing.
+Use this event for event-driven integration if preferred.
