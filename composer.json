@@ -10,20 +10,45 @@
   ],
   "require": {
     "php": "^8.2",
-    "illuminate/support": "^11.0|^12.0",
     "illuminate/http": "^11.0|^12.0",
-    "illuminate/routing": "^11.0|^12.0"
+    "illuminate/routing": "^11.0|^12.0",
+    "illuminate/support": "^11.0|^12.0",
+    "spatie/laravel-package-tools": "^1.19"
+  },
+  "require-dev": {
+    "laravel/pint": "^1.20",
+    "orchestra/testbench": "^9.0|^10.0",
+    "pestphp/pest": "^3.8",
+    "pestphp/pest-plugin-laravel": "^3.1",
+    "phpstan/phpstan": "^1.12"
   },
   "autoload": {
     "psr-4": {
       "Codepreneur\\HalkPayGateway\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Codepreneur\\HalkPayGateway\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/pest",
+    "test:coverage": "vendor/bin/pest --coverage",
+    "analyse": "vendor/bin/phpstan analyse",
+    "format": "vendor/bin/pint"
+  },
   "extra": {
     "laravel": {
       "providers": [
         "Codepreneur\\HalkPayGateway\\HalkPayGatewayServiceProvider"
       ]
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
     }
   },
   "minimum-stability": "stable",
