@@ -1,0 +1,8 @@
+includes:
+  - vendor/orchestra/testbench-core/larastan/extension.neon
+
+parameters:
+  paths:
+    - src
+    - config
+  level: 5
