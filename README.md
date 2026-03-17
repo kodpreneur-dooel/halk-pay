@@ -10,23 +10,6 @@ composer require codepreneur/halk-pay
 
 > Supports Laravel 11/12 and PHP 8.2+.
 
-## Package development structure
-
-This package now follows the standard Spatie Laravel package skeleton conventions:
-
-- Service provider built on `spatie/laravel-package-tools`
-- Test suite powered by Pest + Orchestra Testbench
-- CI workflow matrix for PHP/Laravel combinations
-- Static analysis (`phpstan`) and formatting (`pint`) scripts
-
-Run local quality checks:
-
-```bash
-composer test
-composer analyse
-composer format
-```
-
 ## Setup (works in any Laravel project)
 
 ### 1) Publish package config
