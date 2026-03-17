@@ -62,9 +62,8 @@ class HalkPayService
     {
         $hash = trim((string)($payload['HASH'] ?? ''));
         $hashParams = trim((string)($payload['HASHPARAMS'] ?? ''));
-        $hashParamsVal = (string)($payload['HASHPARAMSVAL'] ?? '');
 
-        if ($hash === '' || $hashParams === '' || $hashParamsVal === '') {
+        if ($hash === '' || $hashParams === '') {
             return false;
         }
 
@@ -74,10 +73,39 @@ class HalkPayService
             return false;
         }
 
+        $hashParamsVal = $this->buildHashParamsValue($payload, $hashParams);
+
+        if ($hashParamsVal === '') {
+            return false;
+        }
+
         $computed = base64_encode(
             hash('sha512', $hashParamsVal . $storeKey, true)
         );
 
         return hash_equals($computed, $hash);
+    }
+
+    /**
+     * HALKPAY sends HASHPARAMS as a separator-delimited field list, often with a trailing separator.
+     *
+     * @param array<string, mixed> $payload
+     */
+    private function buildHashParamsValue(array $payload, string $hashParams): string
+    {
+        $delimiter = str_contains($hashParams, ':') ? ':' : '|';
+        $keys = array_filter(explode($delimiter, $hashParams), static fn(string $key): bool => $key !== '');
+
+        if ($keys === []) {
+            return '';
+        }
+
+        $hashParamsVal = '';
+
+        foreach ($keys as $key) {
+            $hashParamsVal .= (string)($payload[$key] ?? '');
+        }
+
+        return $hashParamsVal;
     }
 }
