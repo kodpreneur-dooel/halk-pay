@@ -19,8 +19,7 @@ class HalkPayGatewayServiceProvider extends PackageServiceProvider
         $package
             ->name('halkpay')
             ->hasConfigFile('halkpay')
-            ->hasViews('halkpay')
-            ->hasRoute('web');
+            ->hasViews('halkpay');
     }
 
     public function packageRegistered(): void
@@ -33,6 +32,10 @@ class HalkPayGatewayServiceProvider extends PackageServiceProvider
     public function packageBooted(): void
     {
         Route::aliasMiddleware('halkpay.hash', ValidateHalkPayCallbackHash::class);
+
+        if ((bool) config('halkpay.routes.enabled', true)) {
+            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        }
 
         $this->publishes([
             __DIR__.'/../config/halkpay.php' => config_path('halkpay.php'),
