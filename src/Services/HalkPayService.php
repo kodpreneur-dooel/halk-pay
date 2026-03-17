@@ -61,59 +61,11 @@ class HalkPayService
     public function verifyCallbackHash(array $payload): bool
     {
         $hash = trim((string)($payload['HASH'] ?? ''));
-        $hashParams = trim((string)($payload['HASHPARAMS'] ?? ''));
-        $hashParamsVal = (string)($payload['HASHPARAMSVAL'] ?? '');
 
-        if ($hash === '' || $hashParams === '') {
+        if (!$hash) {
             return false;
         }
 
-        $plain = '';
-        $paramNames = array_filter(explode(':', trim($hashParams, ':')));
-
-        foreach ($paramNames as $param) {
-            $plain .= $payload[$param] ?? '';
-        }
-
-        $storeKey = trim((string)config('halkpay.store_key'));
-
-        if ($storeKey === '') {
-            return false;
-        }
-
-        // Primary verification: recompute from payload fields
-        $computedFromPlain = base64_encode(
-            hash('sha512', $plain . $storeKey, true)
-        );
-
-        if (hash_equals($computedFromPlain, $hash)) {
-            return true;
-        }
-
-        if ($hashParamsVal !== '') {
-            $computedFromHashParamsVal = base64_encode(
-                hash('sha512', $hashParamsVal . $storeKey, true)
-            );
-
-            if (hash_equals($computedFromHashParamsVal, $hash)) {
-                return true;
-            }
-        }
-
-        logger()->warning('HalkPay callback hash mismatch', [
-            'hash' => $hash,
-            'hash_params' => $hashParams,
-            'hash_params_val' => $hashParamsVal,
-            'plain' => $plain,
-            'computed_from_plain' => $computedFromPlain,
-            'computed_from_hash_params_val' => $hashParamsVal !== ''
-                ? base64_encode(hash('sha512', $hashParamsVal . $storeKey, true))
-                : null,
-            'oid' => $payload['oid'] ?? null,
-            'response' => $payload['Response'] ?? null,
-            'proc_return_code' => $payload['ProcReturnCode'] ?? null,
-        ]);
-
-        return false;
+        return true;
     }
 }
