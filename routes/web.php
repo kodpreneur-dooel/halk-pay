@@ -1,6 +1,7 @@
 <?php
 
 use Codepreneur\HalkPayGateway\Http\Controllers\PaymentCallbackController;
+use Codepreneur\HalkPayGateway\Http\Controllers\PaymentReturnController;
 use Codepreneur\HalkPayGateway\Http\Controllers\RedirectToGatewayController;
 use Illuminate\Support\Facades\Route;
 
@@ -12,8 +13,13 @@ Route::middleware($routeMiddleware)
     ->prefix($routePrefix)
     ->name($routeNamePrefix)
     ->group(function (): void {
-        Route::post('/redirect', RedirectToGatewayController::class)->name('redirect');
-        Route::post('/callback', PaymentCallbackController::class)
+        Route::post('redirect', RedirectToGatewayController::class)
+            ->name('redirect');
+
+        Route::match(['GET', 'POST'], 'return', PaymentReturnController::class)
+            ->name('return');
+
+        Route::post('callback', PaymentCallbackController::class)
             ->middleware('halkpay.hash')
             ->name('callback');
     });

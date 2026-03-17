@@ -61,11 +61,23 @@ class HalkPayService
     public function verifyCallbackHash(array $payload): bool
     {
         $hash = trim((string)($payload['HASH'] ?? ''));
+        $hashParams = trim((string)($payload['HASHPARAMS'] ?? ''));
+        $hashParamsVal = (string)($payload['HASHPARAMSVAL'] ?? '');
 
-        if (!$hash) {
+        if ($hash === '' || $hashParams === '' || $hashParamsVal === '') {
             return false;
         }
 
-        return true;
+        $storeKey = trim((string)config('halkpay.store_key'));
+
+        if ($storeKey === '') {
+            return false;
+        }
+
+        $computed = base64_encode(
+            hash('sha512', $hashParamsVal . $storeKey, true)
+        );
+
+        return hash_equals($computed, $hash);
     }
 }
